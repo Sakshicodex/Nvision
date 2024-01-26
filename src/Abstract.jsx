@@ -55,7 +55,7 @@ const AbstractSubmissionForm = () => {
   
     if (isValid) {
       try {
-        const response = await fetch('http://139.59.71.172:3000/check-submission', {
+        const response = await fetch('https://octopus-app-9nth2.ondigitalocean.app/check-submission', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -109,7 +109,7 @@ const AbstractSubmissionForm = () => {
     console.log('Sending data:', formattedData);
   
     try {
-      const response = await fetch('https://139.59.71.172:3000/submit-abstract', {
+      const response = await fetch('https://octopus-app-9nth2.ondigitalocean.app/submit-abstract', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

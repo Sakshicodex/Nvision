@@ -52,7 +52,7 @@ const WorkshopRegistration = () => {
     formData.append('screenshot', screenshot);
   
     try {
-      const response = await fetch('http://139.59.71.172:3000/submit-workshop', {
+      const response = await fetch('https://octopus-app-9nth2.ondigitalocean.app/submit-workshop', {
         method: 'POST',
         body: formData,
       });

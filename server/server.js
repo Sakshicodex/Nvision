@@ -8,7 +8,7 @@ const upload = multer({ dest: 'uploads/' }); // Configure multer
 
 const app = express();
 const corsOptions = {
-  origin: 'http://localhost:3001', // or use a function to dynamically set the origin based on the request
+  origin: 'https://nvision-24.vercel.app/', // or use a function to dynamically set the origin based on the request
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   allowedHeaders: 'Content-Type,Authorization',
   credentials: true,

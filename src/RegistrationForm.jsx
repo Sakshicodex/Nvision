@@ -181,7 +181,7 @@ const RegistrationForm = () => {
     }
 
     try {
-      const response = await fetch('http://localhost:3000/submit-registration', {
+      const response = await fetch('https://139.59.71.172:3000/submit-registration', {
         method: 'POST',
         body: formDataToSend,
       });

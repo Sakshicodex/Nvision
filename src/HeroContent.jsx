@@ -32,6 +32,13 @@ const HeroContent = ({ onRegisterClick }) => {
         >
           <h1 className="text-4xl font-bold text-black">Welcome to N-VISION ‘24</h1>
         </motion.div>
+        <motion.div
+          variants={slideInFromLeft(1.6)}
+          className="mt-6 py-2 px-4 bg-purple-500 text-white font-medium text-lg rounded-lg"
+        >
+          <p>📅 Date: 26th to 28th April</p>
+          <p>📍 Venue: K. S. Hegde Medical Academy, Mangaluru</p>
+        </motion.div>
 
         <motion.h2
           variants={slideInFromLeft(0.5)}

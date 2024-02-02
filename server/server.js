@@ -19,7 +19,7 @@ const bufferToStream = (buffer) => {
 const app = express();
 const corsOptions = {
   origin: function (origin, callback) {
-    const allowedOrigins = ['http://localhost:3001']; // List your allowed origins just once
+    const allowedOrigins = ['https://nvision-24.vercel.app','https://nvision-24.vercel.app/']; // List your allowed origins just once
     if (!origin || allowedOrigins.includes(origin)) { // Use 'includes' for better readability
       callback(null, true);
     } else {

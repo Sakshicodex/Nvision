@@ -20,12 +20,20 @@ const upload = multer({ storage: storage });
 
 const app = express();
 const corsOptions = {
-  origin: 'https://nvision-24.vercel.app/', // or use a function to dynamically set the origin based on the request
+  origin: function (origin, callback) {
+    const allowedOrigins = ['https://nvision-24.vercel.app','https://nvision-24.vercel.app/']; // Add more origins as needed
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   allowedHeaders: 'Content-Type,Authorization',
   credentials: true,
-  optionsSuccessStatus: 204 // some legacy browsers (IE11, various SmartTVs) choke on 204
+  optionsSuccessStatus: 204
 };
+
 app.options('*', cors(corsOptions));
 
 

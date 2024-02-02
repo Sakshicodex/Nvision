@@ -149,7 +149,7 @@ const RegistrationForm = () => {
 
     try {
       
-      const response = await fetch('https://octopus-app-9nth2.ondigitalocean.app/submit-registration', {
+      const response = await fetch('http://localhost:3000/submit-registration', {
         method: 'POST',
         body: formDataToSend,
       });

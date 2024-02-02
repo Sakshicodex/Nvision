@@ -2,40 +2,38 @@ require('dotenv').config();
 const express = require('express');
 const { google } = require('googleapis');
 const cors = require('cors');
+const path = require('path');
 const multer = require('multer');
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-      cb(null, 'uploads/')
-  },
-  filename: function (req, file, cb) {
-      // Use the original file name, or append the correct file extension based on the MIME type
-      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-      cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
-  }
-});
-
+const storage = multer.memoryStorage(); // Use memory storage
 const upload = multer({ storage: storage });
+const { Readable } = require('stream'); // Import the Readable module from 'stream'
 
 
+const bufferToStream = (buffer) => {
+  const stream = new Readable();
+  stream.push(buffer); // Push the buffer to the stream
+  stream.push(null); // Indicate the end of the stream (EOF)
+  return stream;
+};
 
 const app = express();
-// const corsOptions = {
-//   origin: function (origin, callback) {
-//     const allowedOrigins = ['https://nvision-24.vercel.app']; // List your allowed origins just once
-//     if (!origin || allowedOrigins.includes(origin)) { // Use 'includes' for better readability
-//       callback(null, true);
-//     } else {
-//       callback(new Error('Not allowed by CORS'));
-//     }
-//   },
-//   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-//   allowedHeaders: 'Content-Type,Authorization',
-//   credentials: true,
-//   optionsSuccessStatus: 204
-// };
+const corsOptions = {
+  origin: function (origin, callback) {
+    const allowedOrigins = ['http://localhost:3001']; // List your allowed origins just once
+    if (!origin || allowedOrigins.includes(origin)) { // Use 'includes' for better readability
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  allowedHeaders: 'Content-Type,Authorization',
+  credentials: true,
+  optionsSuccessStatus: 204
+};
 
-// app.options('*', cors(corsOptions)); // This will apply to all OPTIONS requests
-app.use(cors());
+app.options('*', cors(corsOptions)); // This will apply to all OPTIONS requests
+app.use(cors(corsOptions)); // This applies CORS to all other requests
 
 
 
@@ -65,30 +63,29 @@ async function uploadToDrive(filename, mimeType, buffer) {
   const drive = google.drive({ version: 'v3', auth: jwtClient });
   const fileMetadata = {
     name: filename,
-    parents: [process.env.GOOGLE_DRIVE_FOLDER_ID] // Your Google Drive folder ID
+    parents: [process.env.GOOGLE_DRIVE_FOLDER_ID], // Specify the folder ID
   };
   const media = {
     mimeType: mimeType,
-    body: buffer
+    body: bufferToStream(buffer), // Convert the buffer to a stream
   };
   const file = await drive.files.create({
     resource: fileMetadata,
     media: media,
-    fields: 'id, webViewLink'
+    fields: 'id, webViewLink',
   });
-  
-  // Set file as publicly readable (or set appropriate permissions)
+
+  // Permissions and return link as before
   await drive.permissions.create({
     fileId: file.data.id,
     requestBody: {
       type: 'anyone',
-      role: 'reader'
-    }
+      role: 'reader',
+    },
   });
-  
+
   return file.data.webViewLink;
 }
-
 // Google Sheets: Update function
 async function appendToSheet(spreadsheetId, range, values) {
   const sheets = google.sheets({ version: 'v4', auth: jwtClient });
@@ -117,30 +114,40 @@ async function readFromSheet(spreadsheetId, range) {
   return response.data.values;
 }
 
-// Express POST endpoint
 app.post('/submit-registration', upload.single('screenshot'), async (req, res) => {
+  if (!req.file) {
+    return res.status(400).send('Screenshot file is missing.'); // Ensures a file is uploaded
+  }
+  if (!req.body.registrationData) {
+    return res.status(400).send('Registration data is missing.'); // Ensures registration data is present
+  }
+
   try {
-    // Assuming you have the file buffer and filename from the upload
-    const { buffer, originalname, mimetype } = req.file; // Access file from req.file
+    // Destructuring directly from req.file might not be safe if req.file is undefined
+    const file = req.file;
+    const originalname = file.originalname;
+    const mimetype = file.mimetype;
+    const buffer = file.buffer; // Ensure your multer configuration is set to keep the file in memory if using buffer
     
-    // Upload the file to Google Drive
+    console.log(`Uploading file: ${originalname}, Type: ${mimetype}, Size: ${buffer.length}`);
+
     const webViewLink = await uploadToDrive(originalname, mimetype, buffer);
-    
-    // Prepare the form data, including the link to the uploaded file
+    console.log(`File uploaded successfully: ${webViewLink}`);
+
+    // Parse registration data safely
     const registrationData = JSON.parse(req.body.registrationData);
-const formDataWithLink = [...Object.values(registrationData).map(value => 
-  Array.isArray(value) && value.length === 0 ? "None" : value
-), webViewLink];
-   
-    // Append the form data to the Google Sheets
+    const formDataWithLink = [...Object.values(registrationData), webViewLink];
+
     await appendToSheet(process.env.GOOGLE_SHEETS_ID, 'A1', formDataWithLink);
-    
     res.status(200).send('Registration and file upload successful');
   } catch (error) {
-    console.error('Error:', error);
-    res.status(500).send('An error occurred');
+    console.error('Error processing submission:', error);
+    res.status(500).send('An error occurred during submission.');
   }
 });
+
+
+
 
 app.post('/check-submission', async (req, res) => {
   const { registrationNumber } = req.body;

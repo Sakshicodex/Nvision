@@ -5,6 +5,7 @@ import Success from './Success'; // Import the Success component
 import AbstractSubmissionForm from './Abstract';
 import WorkshopRegistrationForm from './Workshop';
 import SuccessPage from './Success2';
+import Success3 from './Succes3';
 
 function App() {
   return (
@@ -15,6 +16,8 @@ function App() {
         <Route path="/abstract-submission" element={<AbstractSubmissionForm />} /> {/* Define the /success route */}
         <Route path="/workshop-registration" element={<WorkshopRegistrationForm />} /> {/* Define the /success route */}
         <Route path="/successfull" element={<SuccessPage />} /> {/* Define the /success route */}
+        <Route path="/abstract-success" element={<Success3 />} /> {/* Define the /success route */}
+
 
 
 

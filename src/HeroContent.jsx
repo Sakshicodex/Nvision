@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import { motion } from "framer-motion";
 import { slideInFromLeft, slideInFromTop } from "./motion";
-import Logo from './logo1.jpeg'
+import Logo from './final.jpg'
 
 import { Link } from 'react-router-dom';
 
@@ -23,15 +23,20 @@ const HeroContent = ({ onRegisterClick }) => {
           src={Logo}
           alt="N-VISION Logo"
           variants={slideInFromTop}
-          style={{ maxWidth: '300px', height: 'auto' }} // Adjust the maxWidth to your preference
-          className="mb-4" // You can adjust margin as needed
+          style={{  height: 'auto' }} // Adjust the maxWidth to your preference
+          className="mb-0" // You can adjust margin as needed
         />
         <motion.div
-          variants={slideInFromTop}
-          className="py-[8px] px-[7px] border border-[#7042f88b] opacity-[0.9] rounded-full"
-        >
-          <h1 className="text-4xl font-bold text-black">Welcome to N-VISION ‘24</h1>
-        </motion.div>
+  variants={slideInFromTop}
+  className="py-[8px] px-[7px] border border-[#7042f88b] opacity-[0.9] rounded-full"
+>
+  <a href="http://www.nvisionkshema.com" target="_blank" rel="noopener noreferrer">
+    <h1 className="text-4xl font-bold text-black cursor-pointer">
+      Welcome to N-VISION ‘24
+    </h1>
+  </a>
+</motion.div>
+
         <motion.div
           variants={slideInFromLeft(1.6)}
           className="mt-6 py-2 px-4 bg-purple-500 text-white font-medium text-lg rounded-lg"
@@ -49,7 +54,7 @@ const HeroContent = ({ onRegisterClick }) => {
 
         <motion.p
           variants={slideInFromLeft(0.8)}
-          className="text-lg text-gray-300 my-5 max-w-[600px] mt-6"
+          className="text-lg text-gray-600 my-5 max-w-[600px] mt-6"
         >
           Join us for a journey through groundbreaking medical advancements and discussions at K. S. Hegde Medical Academy Mangaluru.
         </motion.p>
@@ -58,7 +63,7 @@ const HeroContent = ({ onRegisterClick }) => {
         <div className="flex flex-wrap gap-4 justify-center mt-6">
         <motion.div
  onClick={onRegisterClick}   variants={slideInFromLeft(1)}
-  className="py-3 px-6 bg-purple-600 text-white font-medium text-lg rounded-lg cursor-pointer hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50"
+  className="py-3 px-6 bg-purple-600 text-white font-medium text-lg rounded-lg cursor-pointer hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50 mb-4"
 >
   Registration Form
 </motion.div>
@@ -67,7 +72,7 @@ const HeroContent = ({ onRegisterClick }) => {
           <Link to="/workshop-registration">
             <motion.div
               variants={slideInFromLeft(1.2)}
-              className="py-3 px-6 bg-purple-600 text-white font-medium text-lg rounded-lg cursor-pointer hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50"
+              className="py-3 px-6 bg-purple-600 text-white font-medium text-lg rounded-lg cursor-pointer hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50 mb-4"
             >
               Workshop Registration
             </motion.div>
@@ -76,7 +81,7 @@ const HeroContent = ({ onRegisterClick }) => {
           <Link to="/abstract-submission">
             <motion.div
               variants={slideInFromLeft(1.4)}
-              className="py-3 px-6 bg-purple-600 text-white font-medium text-lg rounded-lg cursor-pointer hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50"
+              className="py-3 px-6 bg-purple-600 text-white font-medium text-lg rounded-lg cursor-pointer hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50 mb-4"
             >
               Abstract Submission
             </motion.div>

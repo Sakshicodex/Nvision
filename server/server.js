@@ -3,7 +3,19 @@ const express = require('express');
 const { google } = require('googleapis');
 const cors = require('cors');
 const multer = require('multer');
-const upload = multer({ dest: 'uploads/' }); // Configure multer
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+      cb(null, 'uploads/')
+  },
+  filename: function (req, file, cb) {
+      // Use the original file name, or append the correct file extension based on the MIME type
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+      cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({ storage: storage });
+
 
 
 const app = express();

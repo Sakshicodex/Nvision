@@ -17,8 +17,8 @@ const RegistrationForm = () => {
     state: '',
     category: '',
     registrationCategory: '',
-    workshopMorning: [],
-    workshopAfternoon: [],
+    workshopMorning: '', // Changed to a string since only one can be selected
+    workshopAfternoon: '', 
     totalAmount: 0,
   });
 
@@ -55,62 +55,46 @@ const RegistrationForm = () => {
 
   const [selectedMorningWorkshop, setSelectedMorningWorkshop] = useState("");
   const [selectedAfternoonWorkshop, setSelectedAfternoonWorkshop] = useState("");
-  const handleMorningCheckboxChange = (event) => {
-    const { value } = event.target;
-    // If the checkbox being clicked is already selected, unselect it, otherwise select the new one
-    setSelectedMorningWorkshop(selectedMorningWorkshop === value ? "" : value);
-  };
-
-  const handleAfternoonCheckboxChange = (event) => {
-    const { value } = event.target;
-    // If the checkbox being clicked is already selected, unselect it, otherwise select the new one
-    setSelectedAfternoonWorkshop(selectedAfternoonWorkshop === value ? "" : value);
-  };
-
+  
+  
+  
+  
 
   const updateTotalAmount = () => {
-    let total = 0;
+    let total = 0; // Start with a total of 0
+  
     const conferencePrices = {
       'UG and Interns': 1500,
       'PG and PhD': 2000,
       'Faculty, Consultant and Others': 2000
     };
-
-    // Update the base price based on the selected category
-    const basePrice = conferencePrices[formData.category] || 0;
-
-    // Define workshop prices
-    const workshopPrice = formData.registrationCategory === 'Conference + Workshop' ? 400 : 1000;
-
-    // Add the base price if "Conference only" is selected
-    if (formData.registrationCategory === 'Conference only') {
-      total += basePrice;
+  
+    // Base price if the conference is included
+    if (formData.registrationCategory !== 'Workshop only') {
+      total += conferencePrices[formData.category] || 0;
     }
-
-    // Add workshop prices if "Workshop only" or "Conference + Workshop" is selected
-    if (formData.registrationCategory === 'Workshop only' || formData.registrationCategory === 'Conference + Workshop') {
-      let workshopCount = 0;
-
-      // If a morning workshop is selected, add to the workshop count
-      if (selectedMorningWorkshop) {
-        workshopCount += 1;
+  
+    const workshopAdditionalPrice = 400; // Additional price if attending both conference and workshop
+  
+    // If 'Workshop only' or 'Conference + Workshop' is selected
+    if (formData.registrationCategory.includes('Workshop')) {
+      // If a morning workshop is selected, add the workshop price
+      if (formData.workshopMorning) {
+        total += formData.registrationCategory === 'Conference + Workshop' ? workshopAdditionalPrice : 1000;
       }
-
-      // If an afternoon workshop is selected, add to the workshop count
-      if (selectedAfternoonWorkshop) {
-        workshopCount += 1;
-      }
-
-      // Calculate the total based on the number of workshops and add base price if "Conference + Workshop" is selected
-      total += workshopPrice * workshopCount;
-      if (formData.registrationCategory === 'Conference + Workshop') {
-        total += basePrice;
+      // If an afternoon workshop is selected, add the workshop price
+      if (formData.workshopAfternoon) {
+        total += formData.registrationCategory === 'Conference + Workshop' ? workshopAdditionalPrice : 1000;
       }
     }
-
-    // Update the formData state with the new total amount
-    setFormData({ ...formData, totalAmount: total });
+  
+    // Set the total amount in the formData state
+    setFormData(prevFormData => ({
+      ...prevFormData,
+      totalAmount: total
+    }));
   };
+  
   const [screenshot, setScreenshot] = useState(null);
 
 
@@ -121,9 +105,11 @@ const RegistrationForm = () => {
   }, [
     formData.category,
     formData.registrationCategory,
-    selectedMorningWorkshop,
-    selectedAfternoonWorkshop
+    formData.workshopMorning,
+    formData.workshopAfternoon
   ]);
+  
+  
 
 
   const handleFileChange = (event) => {
@@ -134,37 +120,18 @@ const RegistrationForm = () => {
     const { name, value } = event.target;
     setFormData({ ...formData, [name]: value });
   };
-
   const handleCheckboxChange = (event) => {
-    const { name, checked, value } = event.target;
-
-    // If the checkbox is being checked (not unchecked), update the state
-    if (checked) {
-      setFormData(prevFormData => {
-        // Map through the keys of prevFormData
-        const newFormData = Object.keys(prevFormData).reduce((data, key) => {
-          // If the key is 'workshopMorning' or 'workshopAfternoon',
-          // and it's the same as the name of the checkbox being changed,
-          // set its value to an array with the newly checked value.
-          // Otherwise, keep its original value (which clears any other checked boxes).
-          if ((key === 'workshopMorning' || key === 'workshopAfternoon') && key === name) {
-            data[key] = [value];
-          } else {
-            data[key] = prevFormData[key];
-          }
-          return data;
-        }, {});
-
-        return newFormData;
-      });
-    } else {
-      // If the checkbox is being unchecked, remove its value from the respective array
-      setFormData(prevFormData => {
-        const workshopArray = prevFormData[name].filter(item => item !== value);
-        return { ...prevFormData, [name]: workshopArray };
-      });
-    }
+    const { name, value } = event.target;
+    // Toggle the selected workshop
+    const newValue = formData[name] === value ? '' : value;
+  
+    setFormData({
+      ...formData,
+      [name]: newValue
+    });
   };
+  
+  
 
 
 
@@ -188,7 +155,7 @@ const RegistrationForm = () => {
 
       if (response.ok) {
         // If response is successful
-        navigate('/success');
+        window.location.href = '/success';
       } else {
         // Handle server-side validation errors or other non-2xx responses
         console.error('Submission error:', await response.text());
@@ -209,10 +176,10 @@ const RegistrationForm = () => {
     <motion.div  id="registration-form-section"
       initial="hidden"
       animate="visible"
-      className="flex flex-col items-center justify-center min-h-screen w-full px-4 z-20"
+      className="flex flex-col items-center justify-center min-h-screen w-full px-4 z-20 mt-8"
     >
       <div
-        className="bg-white py-8 px-4 shadow-lg rounded-lg max-w-lg w-full mx-auto"
+        className="bg-white py-8 px-4 shadow-lg rounded-lg max-w-lg w-full mx-auto "
         style={{
           maxWidth: '600px',
           margin: 'auto',
@@ -222,12 +189,12 @@ const RegistrationForm = () => {
         }}
       >
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-700">Register for NVision-24</h1>
+          <h1 className="text-3xl font-bold text-gray-700">Register for N-VISION ‘24</h1>
           <p className="text-md text-gray-500">Fill in the details below to participate</p>
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col items-center justify-center mt-6">
-          <div className="flex w-full justify-between mb-4">
+          <div className="flex flex-wrap justify-center mb-4">
 
             {/* Form fields */}
             {/* Prefix */}
@@ -276,7 +243,7 @@ const RegistrationForm = () => {
             name="kmcNumber"
             placeholder="KMC Number (if not there please write NA)"
             onChange={handleInputChange}
-            className="mb-4 p-3 rounded-lg border border-gray-300 w-80"
+            className="mb-4 p-1 rounded-lg border border-gray-300 w-80"
             required
           />
 
@@ -341,8 +308,8 @@ const RegistrationForm = () => {
             type="checkbox"
             name="workshopMorning"
             value={workshop}
-            checked={selectedMorningWorkshop === workshop}
-            onChange={handleMorningCheckboxChange}
+            checked={formData.workshopMorning === workshop}
+            onChange={handleCheckboxChange}
             className="form-checkbox h-5 w-5 text-purple-600 mt-1"
           />
           <span className="text-md font-medium text-gray-700">{workshop}</span>
@@ -365,8 +332,8 @@ const RegistrationForm = () => {
             type="checkbox"
             name="workshopAfternoon"
             value={workshop}
-            checked={selectedAfternoonWorkshop === workshop}
-            onChange={handleAfternoonCheckboxChange}
+            checked={formData.workshopAfternoon === workshop}
+            onChange={handleCheckboxChange}
             className="form-checkbox h-5 w-5 text-purple-600 mt-1"
           />
           <span className="text-md font-medium text-gray-700">{workshop}</span>

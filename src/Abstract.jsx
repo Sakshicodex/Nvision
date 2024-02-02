@@ -119,7 +119,10 @@ const AbstractSubmissionForm = () => {
   
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
+        
       }
+      window.location.href = '/abstract-success';
+
   
       // TODO: Update UI to reflect successful submission
       console.log('Submission successful');
@@ -138,6 +141,11 @@ const AbstractSubmissionForm = () => {
   return (
     <div className="container mx-auto p-8">
       <h1 className="text-4xl font-bold text-purple-600 mb-8">Abstract Submission</h1>
+      <div className="mb-4 p-4 border-l-4 border-purple-600 bg-purple-100">
+        <p className="text-sm text-purple-700">
+          Kindly note: One delegate is permitted a maximum number of one submission in each presentation category.
+        </p>
+      </div>
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
           <label className="block mb-2 text-sm font-bold text-gray-700">
